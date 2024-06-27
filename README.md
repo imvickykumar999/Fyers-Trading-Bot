@@ -17,15 +17,11 @@ To avoid hitting the rate limits while updating the plot as frequently as possib
 2. **Per Minute**: The maximum is 200 requests per minute. If we set `interval=1000` (1 second), this would result in 60 requests per minute, which is well within the limit.
 3. **Per Day**: The maximum is 10,000 requests per day. If we set `interval=1000` (1 second), this would result in 60 * 60 * 24 = 86,400 requests per day, which exceeds the limit.
 
+<br>
+
 To avoid exceeding the daily limit, we need to adjust the interval to a value that keeps us within the daily limit.
 
-### Adjusting for Daily Limit:
-To stay within the 10,000 requests per day limit, we can calculate the appropriate interval:
-\[ \text{Seconds per day} = 86400 \]
-\[ \text{Allowed requests per day} = 10000 \]
-\[ \text{Minimum interval} = \frac{86400}{10000} = 8.64 \text{ seconds} \]
-
-Rounding up, we should set the interval to 9 seconds.
+![image](https://github.com/imvickykumar999/Fyers-Trading-Bot/assets/50515418/2be3f9c4-39c2-4341-9a4d-8031df1132ac)
 
 ### Updated Code:
 Here’s the updated code with the interval set to 9000 milliseconds (9 seconds):
