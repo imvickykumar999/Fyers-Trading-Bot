@@ -25,7 +25,7 @@ fyers = fyersModel.FyersModel(client_id=client_id, is_async=False, token=access_
 
 # Define the date range for the last one year
 end_date = datetime.now()
-start_date = end_date - timedelta(days=365)
+start_date = end_date - timedelta(days=364)
 
 # Convert the date range to Unix timestamps
 range_from = int(start_date.timestamp())
