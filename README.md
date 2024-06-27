@@ -1,5 +1,6 @@
 ># `Fyers-Trading-Bot`
->![image](https://github.com/imvickykumar999/Fyers-Trading-Bot/assets/50515418/5d133bd5-8ab7-49d3-9458-aa5f87151215)
+>
+>![image](https://github.com/imvickykumar999/Fyers-Trading-Bot/assets/50515418/6130520f-fe00-4850-bf4f-bd94ab8b3970)
 >![candles](https://github.com/imvickykumar999/Fyers-Trading-Bot/assets/50515418/7a2765c1-602c-4f9a-979b-30d619e1a61b)
 
 <br>
