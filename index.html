@@ -102,17 +102,13 @@ select:focus, input[type=text]:focus, input[type=number]:focus {
   <h2>Search/Filter Dropdown</h2>
   <p>Search the stock and derivatives of your choice. Get the security id of it.</p>
 
-  <select id="exchange">
+  <select id="exchange" onchange="updateInstruments()">
     <option value="NSE">NSE</option>
     <option value="BSE">BSE</option>
     <option value="MCX">MCX</option>
   </select>
 
   <select id="instrument">
-    <option value="EQUITY">Stocks</option>
-    <option value="OPTIDX">F&O</option>
-    <option value="COMMODITY">Commodity</option>
-    <option value="CURRENCY">Currency</option>
   </select>
 
   <label for="keyword">Search: 
@@ -121,7 +117,7 @@ select:focus, input[type=text]:focus, input[type=number]:focus {
   <div id="myDropdown" class="dropdown-content">
   </div>
 
-  <br><br><hr><br>
+<br><br><hr><br>
 
   <label>SEC. ID.: 
     <input id="sec-id" readonly type="number">
@@ -129,6 +125,43 @@ select:focus, input[type=text]:focus, input[type=number]:focus {
 </div>
 
 <script>
+const instrumentOptions = {
+  "NSE": ["EQUITY", "OPTIDX", "CURRENCY"],
+  "BSE": ["EQUITY", "OPTIDX"],
+  "MCX": ["COMMODITY"]
+};
+
+const urls = {
+  "NSE": {
+    "EQUITY": "https://public.fyers.in/sym_details/NSE_CM_sym_master.json",
+    "OPTIDX": "https://public.fyers.in/sym_details/NSE_FO_sym_master.json",
+    "CURRENCY": "https://public.fyers.in/sym_details/NSE_CD_sym_master.json"
+  },
+  "BSE": {
+    "EQUITY": "https://public.fyers.in/sym_details/BSE_CM_sym_master.json",
+    "OPTIDX": "https://public.fyers.in/sym_details/BSE_FO_sym_master.json"
+  },
+  "MCX": {
+    "COMMODITY": "https://public.fyers.in/sym_details/MCX_COM_sym_master.json"
+  }
+};
+
+document.addEventListener("DOMContentLoaded", () => {
+  updateInstruments();
+});
+
+function updateInstruments() {
+  const exchange = document.getElementById("exchange").value;
+  const instrumentSelect = document.getElementById("instrument");
+  instrumentSelect.innerHTML = '';
+  instrumentOptions[exchange].forEach(option => {
+    const opt = document.createElement('option');
+    opt.value = option;
+    opt.textContent = option.charAt(0) + option.slice(1).toLowerCase();
+    instrumentSelect.appendChild(opt);
+  });
+}
+
 document.getElementById('keyword').addEventListener('focus', handleFocus);
 
 function handleFocus() {
@@ -149,26 +182,15 @@ function get_put_data(data, id) {
     handleBlur();
     document.getElementById('keyword').value = data;
     document.getElementById('sec-id').value = id;
-};
+}
 
 function getData() {
-  var exchange = document.getElementById("exchange").value;
-  var keyword = document.getElementById("keyword").value;
-  var instrument = document.getElementById("instrument").value;
+  const exchange = document.getElementById("exchange").value;
+  const keyword = document.getElementById("keyword").value;
+  const instrument = document.getElementById("instrument").value;
 
-  let url = '';
-  if (exchange === 'NSE') {
-    if (instrument === 'EQUITY') url = 'https://public.fyers.in/sym_details/NSE_CM_sym_master.json';
-    if (instrument === 'OPTIDX') url = 'https://public.fyers.in/sym_details/NSE_FO_sym_master.json';
-    if (instrument === 'CURRENCY') url = 'https://public.fyers.in/sym_details/NSE_CD_sym_master.json';
-  } else if (exchange === 'BSE') {
-    if (instrument === 'EQUITY') url = 'https://public.fyers.in/sym_details/BSE_CM_sym_master.json';
-    if (instrument === 'OPTIDX') url = 'https://public.fyers.in/sym_details/BSE_FO_sym_master.json';
-  } else if (exchange === 'MCX' && instrument === 'COMMODITY') {
-    url = 'https://public.fyers.in/sym_details/MCX_COM_sym_master.json';
-  }
-
-  if (url === '') {
+  const url = urls[exchange][instrument];
+  if (!url) {
     console.error('Invalid exchange or instrument type');
     return;
   }
