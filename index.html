@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f4f4f9;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.container {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+  max-width: 600px;
+  width: 100%;
+}
+
+h2 {
+  text-align: center;
+  color: #333;
+}
+
+p {
+  text-align: center;
+  color: #666;
+}
+
+.dropbtn, select, input[type=text], input[type=number] {
+  width: calc(100% - 32px);
+  padding: 16px;
+  margin: 8px 0;
+  font-size: 16px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  box-sizing: border-box;
+}
+
+.dropbtn {
+  background-color: #04AA6D;
+  color: white;
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.3s;
+}
+
+.dropbtn:hover, .dropbtn:focus {
+  background-color: #3e8e41;
+}
+
+select, input[type=text], input[type=number] {
+  background-color: #f9f9f9;
+}
+
+select:focus, input[type=text]:focus, input[type=number]:focus {
+  outline: 3px solid #ddd;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: white;
+  min-width: 230px;
+  overflow: auto;
+  border: 1px solid #ddd;
+  z-index: 1;
+  max-height: 200px;
+  overflow-y: auto;
+  border-radius: 8px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.dropdown-content button {
+  background-color: white;
+  color: black;
+  padding: 12px 16px;
+  border: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  border-bottom: 1px solid #ddd;
+  transition: background-color 0.3s;
+}
+
+.dropdown-content button:hover {
+  background-color: #f1f1f1;
+}
+
+.show {display: block;}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h2>Search/Filter Dropdown</h2>
+  <p>Search the stock and derivatives of your choice. Get the security id of it.</p>
+
+  <select id="exchange">
+    <option value="NSE">NSE</option>
+    <option value="BSE">BSE</option>
+    <option value="MCX">MCX</option>
+  </select>
+
+  <select id="instrument">
+    <option value="EQUITY">Stocks</option>
+    <option value="OPTIDX">F&O</option>
+    <option value="COMMODITY">Commodity</option>
+    <option value="CURRENCY">Currency</option>
+  </select>
+
+  <label for="keyword">Search: 
+    <input id="keyword" type="text" onkeyup="getData()" placeholder="Type to search...">
+  </label>
+  <div id="myDropdown" class="dropdown-content">
+  </div>
+
+  <br><br><hr><br>
+
+  <label>SEC. ID.: 
+    <input id="sec-id" readonly type="number">
+  </label>
+</div>
+
+<script>
+document.getElementById('keyword').addEventListener('focus', handleFocus);
+
+function handleFocus() {
+  var divelement = document.getElementById("myDropdown");
+  if (!divelement.classList.contains('show')) {
+      divelement.classList.add("show")
+  }
+}
+
+function handleBlur() {
+  var divelement = document.getElementById("myDropdown");
+  if (divelement.classList.contains('show')) {
+      divelement.classList.remove("show")
+  }
+}
+
+function get_put_data(data, id) {
+    handleBlur();
+    document.getElementById('keyword').value = data;
+    document.getElementById('sec-id').value = id;
+};
+
+function getData() {
+  var exchange = document.getElementById("exchange").value;
+  var keyword = document.getElementById("keyword").value;
+  var instrument = document.getElementById("instrument").value;
+
+  let url = '';
+  if (exchange === 'NSE') {
+    if (instrument === 'EQUITY') url = 'https://public.fyers.in/sym_details/NSE_CM_sym_master.json';
+    if (instrument === 'OPTIDX') url = 'https://public.fyers.in/sym_details/NSE_FO_sym_master.json';
+    if (instrument === 'CURRENCY') url = 'https://public.fyers.in/sym_details/NSE_CD_sym_master.json';
+  } else if (exchange === 'BSE') {
+    if (instrument === 'EQUITY') url = 'https://public.fyers.in/sym_details/BSE_CM_sym_master.json';
+    if (instrument === 'OPTIDX') url = 'https://public.fyers.in/sym_details/BSE_FO_sym_master.json';
+  } else if (exchange === 'MCX' && instrument === 'COMMODITY') {
+    url = 'https://public.fyers.in/sym_details/MCX_COM_sym_master.json';
+  }
+
+  if (url === '') {
+    console.error('Invalid exchange or instrument type');
+    return;
+  }
+
+  fetch(url)
+  .then(response => {
+    if (!response.ok) {
+      throw new Error('Network response was not ok' + response.statusText);
+    }
+    return response.json();
+  })
+  .then(data => {
+    const filteredData = filterData(data, keyword);
+    add_data_options(filteredData);
+  })
+  .catch(error => {
+    console.error('Some issue occurred!!', error);
+  });
+}
+
+function filterData(data, keyword) {
+  const result = [];
+  for (const key in data) {
+    if (data.hasOwnProperty(key)) {
+      const item = data[key];
+      const matchesKeyword = keyword === '' || item.symbolDesc.toLowerCase().includes(keyword.toLowerCase());
+      if (matchesKeyword) {
+        result.push(item);
+      }
+    }
+  }
+  return result;
+}
+
+function add_data_options(data) {
+  const datalist = document.getElementById('myDropdown');
+  datalist.innerHTML = '';
+  data.forEach(item => {
+    const button = `<button onclick="get_put_data('${item['symbolDesc']}', ${item['exToken']})">${item['symbolDesc']}</button>`;
+    datalist.insertAdjacentHTML('beforeEnd', button);
+  });
+}
+
+function filterFunction() {
+  const input = document.getElementById("myInput");
+  const filter = input.value.toUpperCase();
+  const div = document.getElementById("myDropdown");
+  const buttons = div.getElementsByTagName("button");
+  for (let i = 0; i < buttons.length; i++) {
+    const txtValue = buttons[i].textContent || buttons[i].innerText;
+    if (txtValue.toUpperCase().indexOf(filter) > -1) {
+      buttons[i].style.display = "";
+    } else {
+      buttons[i].style.display = "none";
+    }
+  }
+}
+</script>
+
+</body>
+</html>
