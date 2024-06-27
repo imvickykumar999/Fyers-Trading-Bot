@@ -19,7 +19,7 @@ body {
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-  max-width: 600px;
+  max-width: 90%;
   width: 100%;
 }
 
@@ -33,7 +33,7 @@ p {
   color: #666;
 }
 
-.dropbtn, select, input[type=text], input[type=number] {
+select, input[type=text] {
   width: calc(100% - 32px);
   padding: 16px;
   margin: 8px 0;
@@ -41,25 +41,10 @@ p {
   border-radius: 8px;
   border: 1px solid #ddd;
   box-sizing: border-box;
-}
-
-.dropbtn {
-  background-color: #04AA6D;
-  color: white;
-  cursor: pointer;
-  border: none;
-  transition: background-color 0.3s;
-}
-
-.dropbtn:hover, .dropbtn:focus {
-  background-color: #3e8e41;
-}
-
-select, input[type=text], input[type=number] {
   background-color: #f9f9f9;
 }
 
-select:focus, input[type=text]:focus, input[type=number]:focus {
+select:focus, input[type=text]:focus {
   outline: 3px solid #ddd;
 }
 
@@ -67,7 +52,7 @@ select:focus, input[type=text]:focus, input[type=number]:focus {
   display: none;
   position: absolute;
   background-color: white;
-  min-width: 230px;
+  min-width: calc(100% - 32px);
   overflow: auto;
   border: 1px solid #ddd;
   z-index: 1;
@@ -94,6 +79,27 @@ select:focus, input[type=text]:focus, input[type=number]:focus {
 }
 
 .show {display: block;}
+
+table {
+  width: calc(100% - 32px);
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+table, th, td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+th {
+  background-color: #04AA6D;
+  color: white;
+}
+
+tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
 </style>
 </head>
 <body>
@@ -112,16 +118,30 @@ select:focus, input[type=text]:focus, input[type=number]:focus {
   </select>
 
   <label for="keyword">Search: 
-    <input id="keyword" type="text" onkeyup="getData()" placeholder="Type to search...">
+    <input id="keyword" type="text" onkeyup="getData()" placeholder="Type to search..." onfocus="handleFocus()">
   </label>
   <div id="myDropdown" class="dropdown-content">
   </div>
 
-<br><br><hr><br>
+<br><br>
 
-  <label>SEC. ID.: 
-    <input id="sec-id" readonly type="number">
-  </label>
+  <table id="resultsTable" style="display:none;">
+    <thead>
+      <tr>
+        <th>Symbol</th>
+        <th>Security ID</th>
+        <th>Exchange</th>
+        <th>Segment</th>
+        <th>Instrument Type</th>
+        <th>Description</th>
+        <th>Previous Close</th>
+        <th>Upper Price</th>
+        <th>Lower Price</th>
+      </tr>
+    </thead>
+    <tbody id="resultsBody">
+    </tbody>
+  </table>
 </div>
 
 <script>
@@ -162,26 +182,23 @@ function updateInstruments() {
   });
 }
 
-document.getElementById('keyword').addEventListener('focus', handleFocus);
-
 function handleFocus() {
   var divelement = document.getElementById("myDropdown");
   if (!divelement.classList.contains('show')) {
-      divelement.classList.add("show")
+      divelement.classList.add("show");
   }
 }
 
 function handleBlur() {
   var divelement = document.getElementById("myDropdown");
   if (divelement.classList.contains('show')) {
-      divelement.classList.remove("show")
+      divelement.classList.remove("show");
   }
 }
 
-function get_put_data(data, id) {
-    handleBlur();
-    document.getElementById('keyword').value = data;
-    document.getElementById('sec-id').value = id;
+function get_put_data(data) {
+  handleBlur();
+  displayResults([data]);
 }
 
 function getData() {
@@ -229,24 +246,42 @@ function add_data_options(data) {
   const datalist = document.getElementById('myDropdown');
   datalist.innerHTML = '';
   data.forEach(item => {
-    const button = `<button onclick="get_put_data('${item['symbolDesc']}', ${item['exToken']})">${item['symbolDesc']}</button>`;
-    datalist.insertAdjacentHTML('beforeEnd', button);
+    const button = document.createElement('button');
+    button.textContent = item['symbolDesc'];
+    button.onclick = () => {
+      get_put_data(item);
+      document.getElementById("myDropdown").classList.remove("show"); // Hide the dropdown after selection
+    };
+    datalist.appendChild(button);
   });
 }
 
-function filterFunction() {
-  const input = document.getElementById("myInput");
-  const filter = input.value.toUpperCase();
-  const div = document.getElementById("myDropdown");
-  const buttons = div.getElementsByTagName("button");
-  for (let i = 0; i < buttons.length; i++) {
-    const txtValue = buttons[i].textContent || buttons[i].innerText;
-    if (txtValue.toUpperCase().indexOf(filter) > -1) {
-      buttons[i].style.display = "";
-    } else {
-      buttons[i].style.display = "none";
-    }
+function displayResults(data) {
+  const resultsBody = document.getElementById('resultsBody');
+  resultsBody.innerHTML = '';
+
+  if (data.length === 0) {
+    document.getElementById("resultsTable").style.display = 'none';
+    return;
   }
+
+  data.forEach(item => {
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>${item.symbolDesc}</td>
+      <td>${item.exToken}</td>
+      <td>${item.exchangeName}</td>
+      <td>${item.segment}</td>
+      <td>${item.exInstType}</td>
+      <td>${item.symbolDesc}</td>
+      <td>${item.previousClose}</td>
+      <td>${item.upperPrice}</td>
+      <td>${item.lowerPrice}</td>
+    `;
+    resultsBody.appendChild(row);
+  });
+
+  document.getElementById("resultsTable").style.display = 'table';
 }
 </script>
 
