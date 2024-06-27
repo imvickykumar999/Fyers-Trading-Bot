@@ -1,7 +1,11 @@
-# `Fyers-Trading-Bot`
+># `Fyers-Trading-Bot`
+>![image](https://github.com/imvickykumar999/Fyers-Trading-Bot/assets/50515418/5d133bd5-8ab7-49d3-9458-aa5f87151215)
+>![candles](https://github.com/imvickykumar999/Fyers-Trading-Bot/assets/50515418/7a2765c1-602c-4f9a-979b-30d619e1a61b)
 
-![candles](https://github.com/imvickykumar999/Fyers-Trading-Bot/assets/50515418/7a2765c1-602c-4f9a-979b-30d619e1a61b)
-![image](https://github.com/imvickykumar999/Fyers-Trading-Bot/assets/50515418/1dae288a-4268-493a-8663-b3b95cb5858c)
+<br>
+
+    To avoid hitting the rate limits while updating the plot 
+    as frequently as possible, we need to find a balance. 
 
 Given the rate limits:
 ---
@@ -10,7 +14,6 @@ Given the rate limits:
 - **Per Minute**: 200 requests
 - **Per Day**: 10,000 requests
 
-To avoid hitting the rate limits while updating the plot as frequently as possible, we need to find a balance. 
 
 ### Calculation:
 1. **Per Second**: The maximum is 10 requests per second. If we set `interval=1000` (1 second), we would be making 1 request per second, which is safe.
