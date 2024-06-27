@@ -33,7 +33,7 @@ p {
   color: #666;
 }
 
-input[type=text] {
+select, input[type=text] {
   width: calc(100% - 32px);
   padding: 16px;
   margin: 8px 0;
@@ -44,7 +44,7 @@ input[type=text] {
   background-color: #f9f9f9;
 }
 
-input[type=text]:focus {
+select:focus, input[type=text]:focus {
   outline: 3px solid #ddd;
 }
 
@@ -127,8 +127,14 @@ tr:nth-child(even) {
 <body>
 
 <div class="container">
-  <h2>Search/Filter Dropdown</h2>
-  <p>Search the stock and derivatives of your choice. Get the security id of it.</p>
+  <h2>Trading Bot</h2>
+  <p>Search the stock and derivatives of your choice.</p>
+
+  <select id="exchange">
+    <option value="NSE">NSE</option>
+    <option value="BSE">BSE</option>
+    <option value="MCX">MCX</option>
+  </select>
 
   <label for="keyword">Search: 
     <input id="keyword" type="text" onkeyup="getData()" placeholder="Type to search..." onfocus="handleFocus()">
@@ -159,14 +165,20 @@ tr:nth-child(even) {
 </div>
 
 <script>
-const urls = [
-  "https://public.fyers.in/sym_details/NSE_CD_sym_master.json",
-  "https://public.fyers.in/sym_details/NSE_FO_sym_master.json",
-  "https://public.fyers.in/sym_details/NSE_CM_sym_master.json",
-  "https://public.fyers.in/sym_details/BSE_CM_sym_master.json",
-  "https://public.fyers.in/sym_details/BSE_FO_sym_master.json",
-  "https://public.fyers.in/sym_details/MCX_COM_sym_master.json"
-];
+const urls = {
+  "NSE": [
+    "https://public.fyers.in/sym_details/NSE_CD_sym_master.json",
+    "https://public.fyers.in/sym_details/NSE_FO_sym_master.json",
+    "https://public.fyers.in/sym_details/NSE_CM_sym_master.json"
+  ],
+  "BSE": [
+    "https://public.fyers.in/sym_details/BSE_CM_sym_master.json",
+    "https://public.fyers.in/sym_details/BSE_FO_sym_master.json"
+  ],
+  "MCX": [
+    "https://public.fyers.in/sym_details/MCX_COM_sym_master.json"
+  ]
+};
 
 document.getElementById('keyword').addEventListener('focus', handleFocus);
 
@@ -190,6 +202,7 @@ function get_put_data(data) {
 }
 
 function getData() {
+  const exchange = document.getElementById("exchange").value;
   const keyword = document.getElementById("keyword").value;
   if (!keyword) {
     return;
@@ -197,7 +210,7 @@ function getData() {
 
   document.getElementById("loadingIcon").style.display = 'block'; // Show loading icon
 
-  const fetchDataPromises = urls.map(url =>
+  const fetchDataPromises = urls[exchange].map(url =>
     fetch(url)
       .then(response => {
         if (!response.ok) {
