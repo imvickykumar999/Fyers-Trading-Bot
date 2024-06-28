@@ -1,7 +1,8 @@
 ># `Fyers-Trading-Bot`
 >
->![image](https://github.com/imvickykumar999/Fyers-Trading-Bot/assets/50515418/6130520f-fe00-4850-bf4f-bd94ab8b3970)
->![candles](https://github.com/imvickykumar999/Fyers-Trading-Bot/assets/50515418/7a2765c1-602c-4f9a-979b-30d619e1a61b)
+>[![image](https://github.com/imvickykumar999/Fyers-Trading-Bot/assets/50515418/6130520f-fe00-4850-bf4f-bd94ab8b3970)](https://imvickykumar999.github.io/Fyers-Trading-Bot/)
+>
+>[![candles](https://github.com/imvickykumar999/Fyers-Trading-Bot/assets/50515418/7a2765c1-602c-4f9a-979b-30d619e1a61b)](https://in.tradingview.com/chart/?symbol=FRASER)
 
 <br>
 
